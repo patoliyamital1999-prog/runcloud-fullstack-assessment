@@ -1,0 +1,6 @@
+laravel-voting-frontend/vendor
+laravel-voting-frontend/node_modules
+laravel-voting-frontend/.env
+
+.DS_Store
+Thumbs.db
