@@ -1,6 +1,11 @@
-laravel-voting-frontend/vendor
-laravel-voting-frontend/node_modules
-laravel-voting-frontend/.env
+laravel-voting/vendor
+laravel-voting/node_modules
+laravel-voting/.env
+
+laravel-voting/storage/logs/*
+laravel-voting/storage/framework/cache/*
+laravel-voting/storage/framework/sessions/*
+laravel-voting/storage/framework/views/*
 
 .DS_Store
 Thumbs.db

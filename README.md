@@ -1,6 +1,11 @@
-# Laravel Voting Frontend
+# Full-Stack Assessment (WordPress + Laravel)
 
-Laravel application for the Full-Stack Developer Assessment. It displays WordPress posts from a custom voting plugin and lets authenticated users vote via AJAX.
+Monorepo for the Full-Stack Developer Assessment.
+
+| Folder | Description |
+|--------|-------------|
+| `wordpress-voting/wp-content/plugins/post-votes-api/` | WordPress voting plugin (backend API) |
+| `laravel-voting/` | Laravel frontend (auth, posts UI, AJAX voting) |
 
 ## Requirements
 
@@ -8,19 +13,21 @@ Laravel application for the Full-Stack Developer Assessment. It displays WordPre
 - Composer
 - Node.js & npm
 - MySQL/SQLite (default: SQLite)
-- WordPress with the **Post Votes API** plugin active (`wordpress-voting/wp-content/plugins/post-votes-api`)
+- WordPress installation
 
 ## WordPress setup
 
-1. Install WordPress and activate the **Post Votes API** plugin.
-2. (Recommended) Add to `wp-config.php` before `/* That's all, stop editing! */`:
+1. Install WordPress on your server.
+2. Copy `wordpress-voting/wp-content/plugins/post-votes-api/` into your WordPress `wp-content/plugins/` folder.
+3. Activate **Post Votes API** in WP Admin → Plugins.
+4. (Recommended) Add to `wp-config.php` before `/* That's all, stop editing! */`:
 
 ```php
 define('PVA_SECRET_TOKEN', 'your_secret_token_here');
 ```
 
-3. Create a few published posts in WordPress.
-4. Verify the API:
+5. Create a few published posts in WordPress.
+6. Verify the API:
    - Posts: `GET /wp-json/wp/v2/posts` — each post should include a `votes` object.
    - Vote API: `POST /wp-json/post-votes/v1/vote` with header `Authorization: Bearer your_secret_token_here`.
 
@@ -33,7 +40,7 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-Configure `.env`:
+Configure `laravel-voting/.env`:
 
 ```env
 APP_URL=http://localhost:8000
@@ -42,6 +49,8 @@ WORDPRESS_API_URL=http://localhost/wordpress-voting/wp-json/wp/v2/posts
 WORDPRESS_VOTE_API_URL=http://localhost/wordpress-voting/wp-json/post-votes/v1/vote
 WORDPRESS_SECRET_TOKEN=your_secret_token_here
 ```
+
+Update `WORDPRESS_API_URL` and `WORDPRESS_VOTE_API_URL` to match your WordPress site URL.
 
 `WORDPRESS_SECRET_TOKEN` must match `PVA_SECRET_TOKEN` in WordPress.
 
@@ -68,11 +77,12 @@ Open `http://localhost:8000`.
 
 | Path | Purpose |
 |------|---------|
-| `app/Http/Controllers/PostController.php` | Fetches posts from WordPress |
-| `app/Http/Controllers/VoteController.php` | Auth-only vote proxy to WordPress |
-| `app/Models/PostVote.php` | Per-user vote state in Laravel DB |
-| `resources/views/post/posts.blade.php` | Posts UI and vote JavaScript |
-| `config/services.php` | WordPress URL and token config |
+| `wordpress-voting/wp-content/plugins/post-votes-api/post-votes-api.php` | WordPress plugin (votes, REST API, admin page) |
+| `laravel-voting/app/Http/Controllers/PostController.php` | Fetches posts from WordPress |
+| `laravel-voting/app/Http/Controllers/VoteController.php` | Auth-only vote proxy to WordPress |
+| `laravel-voting/app/Models/PostVote.php` | Per-user vote state in Laravel DB |
+| `laravel-voting/resources/views/post/posts.blade.php` | Posts UI and vote JavaScript |
+| `laravel-voting/config/services.php` | WordPress URL and token config |
 
 ## License
 
