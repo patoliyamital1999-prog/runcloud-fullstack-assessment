@@ -14,22 +14,48 @@ Monorepo for the Full-Stack Developer Assessment.
 - Node.js & npm
 - MySQL/SQLite (default: SQLite)
 - WordPress installation
+- Redis server + PHP `redis` extension (optional bonus — see below)
 
 ## WordPress setup
 
 1. Install WordPress on your server.
-2. Copy `wordpress-voting/wp-content/plugins/post-votes-api/` into your WordPress `wp-content/plugins/` folder.
+2. Copy into your WordPress `wp-content/`:
+   - `wordpress-voting/wp-content/plugins/post-votes-api/` → `plugins/post-votes-api/`
+   - `wordpress-voting/wp-content/object-cache.php` → `object-cache.php` (Redis persistent cache)
 3. Activate **Post Votes API** in WP Admin → Plugins.
 4. (Recommended) Add to `wp-config.php` before `/* That's all, stop editing! */`:
 
 ```php
 define('PVA_SECRET_TOKEN', 'your_secret_token_here');
+
+/* Redis object cache (assessment bonus) */
+define('WP_REDIS_HOST', '127.0.0.1');
+define('WP_REDIS_PORT', 6379);
+define('WP_REDIS_PREFIX', 'your_site_prefix:');
 ```
 
 5. Create a few published posts in WordPress.
 6. Verify the API:
    - Posts: `GET /wp-json/wp/v2/posts` — each post should include a `votes` object.
    - Vote API: `POST /wp-json/post-votes/v1/vote` with header `Authorization: Bearer your_secret_token_here`.
+
+### Redis setup (bonus)
+
+```bash
+sudo apt update
+sudo apt install redis-server php-redis
+sudo systemctl enable redis-server
+redis-cli ping   # expect PONG
+```
+
+After `object-cache.php` is in place and Redis is running, `wp_cache_get/set` calls (including the posts REST cache in the voting plugin) persist across requests in Redis. Without Redis, the drop-in falls back to in-memory cache for the current request only.
+
+Verify:
+
+```bash
+curl -s "http://localhost/your-wp-path/wp-json/wp/v2/posts" > /dev/null
+redis-cli KEYS "*post_votes*"
+```
 
 ## Laravel setup
 
@@ -96,12 +122,14 @@ php artisan migrate
 - Vote states: cast, remove (same button), or switch (up ↔ down)
 - WordPress admin dashboard page for post vote statistics
 - WordPress object cache invalidation after successful vote
+- Redis-backed persistent object cache (`wp-content/object-cache.php`)
 
 ## Project structure
 
 | Path | Purpose |
 |------|---------|
 | `wordpress-voting/wp-content/plugins/post-votes-api/post-votes-api.php` | WordPress plugin (votes, REST API, admin page) |
+| `wordpress-voting/wp-content/object-cache.php` | Redis object cache drop-in for `wp_cache_*` |
 | `laravel-voting/app/Http/Controllers/PostController.php` | Fetches posts from WordPress |
 | `laravel-voting/app/Http/Controllers/VoteController.php` | Auth-only vote proxy to WordPress |
 | `laravel-voting/app/Models/PostVote.php` | Per-user vote state in Laravel DB |

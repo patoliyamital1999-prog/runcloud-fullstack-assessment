@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Post Votes API
  * Plugin URI: http://localhost
- * Description: Custom voting system plugin.
+ * Description: Custom voting system with REST API, admin dashboard, and Redis-ready object caching.
  * Version: 1.0
  * Author: Mital Patoliya
  */
