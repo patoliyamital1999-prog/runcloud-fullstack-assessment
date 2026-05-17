@@ -63,6 +63,30 @@ php artisan serve
 
 Open `http://localhost:8000`.
 
+## Authentication
+
+User authentication is implemented with [Laravel Breeze](https://laravel.com/docs/starter-kits#laravel-breeze) (Blade stack). Login, registration, and logout routes live in `laravel-voting/routes/auth.php`.
+
+Breeze was used during development and is already scaffolded in this repository. **No extra install step is required** beyond `composer install` and `php artisan migrate` above.
+
+To verify auth locally, visit:
+
+- `/register` — create an account
+- `/login` — sign in
+- Logout — available from the navigation when authenticated
+
+### Development notes (optional)
+
+If you are rebuilding the Laravel app from scratch, Breeze can be installed with:
+
+```bash
+cd laravel-voting
+composer require laravel/breeze --dev
+php artisan breeze:install blade
+npm install && npm run build
+php artisan migrate
+```
+
 ## Features
 
 - Public blog listing (title, content, vote counts from WordPress)
